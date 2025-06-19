@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project -> txt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Cafe24Meongi-W-v1.0';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2405-3@1.1/Cafe24Meongi-W-v1.0.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .project-title {
+            font-family: 'Cafe24Meongi-W-v1.0', sans-serif;
+        }
+        
+        .project-title .arrow-svg {
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .project-title:hover .arrow-svg {
+            transform: translateX(8px) scale(1.1) rotate(5deg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #c1c1c1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #a8a8a8;
+        }
+
+        /* Org Tab Active State */
+        .org-tab-active {
+            background-color: #3b82f6 !important;
+            color: white !important;
+            box-shadow: 0 4px 20px 0 rgba(59, 130, 246, 0.45);
+        }
+        
+        .glass-modal {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <div id="app-container" class="min-h-screen w-full p-4 md:p-8">
+        <!-- Token Input Screen -->
+        <div id="token-screen" class="max-w-xl mx-auto flex flex-col justify-center min-h-screen">
+            <div class="bg-white p-8 rounded-3xl shadow-xl transition-all duration-300 hover:shadow-2xl">
+                 <h1 class="project-title text-4xl font-bold text-center text-gray-900 mb-2 flex items-center justify-center gap-2 cursor-pointer">
+                    <span>Project</span>
+                     <svg class="arrow-svg w-12 h-12 text-blue-500" viewBox="0 0 55 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.58331 27.5H50.4166" stroke="#3B82F6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M34.375 11.4583L50.4166 27.5L34.375 43.5416" stroke="#3B82F6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>txt</span>
+                </h1>
+                <p class="text-center text-gray-600 mb-8">프로젝트를 텍스트 파일로 쉽게 변환할 수 있어요.</p>
+
+                <div class="space-y-4">
+                    <input type="password" id="token-input" placeholder="GitHub Personal Access Token" class="w-full p-4 text-center rounded-2xl bg-gray-100 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                    <button id="submit-token" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl shadow-blue-500/30 transform hover:-translate-y-0.5">시작하기</button>
+                    <div id="security-warning" class="text-sm p-4 rounded-2xl bg-yellow-100 text-yellow-800 mt-4 text-center hidden">
+                        <!-- Warning messages will appear here -->
+                    </div>
+                     <p class="text-xs text-center text-gray-500 pt-2">
+                        리포지토리 정보에 접근하려면 <a href="https://github.com/settings/tokens?type=beta" target="_blank" class="text-blue-500 hover:underline">GitHub Personal Access Token</a>이 필요해요. 토큰은 브라우저에만 저장되고 저희 서버에는 전송되지 않으니 안심하세요.
+                        <br>토큰에 부여된 권한에 따라 접근 가능한 모든 레포지토리(개인, 조직, 협업 레포 등) 목록을 가져와요.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Repo List Screen -->
+        <div id="repo-screen" class="hidden">
+            <header class="flex flex-wrap justify-between items-center mb-6 gap-4">
+                <h1 class="project-title text-3xl font-bold text-gray-900 flex items-center justify-center gap-1.5">
+                    <span>Project</span>
+                    <svg class="arrow-svg w-9 h-9 text-blue-500" viewBox="0 0 55 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.58331 27.5H50.4166" stroke="#3B82F6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M34.375 11.4583L50.4166 27.5L34.375 43.5416" stroke="#3B82F6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>txt</span>
+                </h1>
+                <div id="controls" class="flex items-center gap-3 md:gap-4">
+                     <button id="url-input-btn" class="text-sm md:text-base px-4 py-2.5 rounded-2xl font-semibold bg-green-500 hover:bg-green-600 text-white transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>
+                        URL 입력
+                    </button>
+                    <button id="change-token-btn" class="text-sm md:text-base px-4 py-2.5 rounded-2xl font-semibold bg-white border border-gray-300 hover:bg-gray-100 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+                        토큰 변경
+                    </button>
+                </div>
+            </header>
+
+            <div class="bg-white p-4 sm:p-6 rounded-3xl shadow-xl">
+                <div id="org-tabs" class="flex flex-wrap gap-2 mb-4 pb-2">
+                    <!-- Org tabs will be generated here -->
+                </div>
+                <input type="text" id="repo-search" placeholder="레포지토리 검색..." class="w-full p-3 mb-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                <div id="repo-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-[65vh] overflow-y-auto pr-2">
+                    <!-- Repo cards will be generated here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- URL Input Modal -->
+        <div id="url-modal" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center hidden z-50 p-4">
+            <div class="glass-modal p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-all scale-95 opacity-0" id="url-modal-content">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">GitHub Repository URL 입력</h2>
+                <p class="mb-6 text-gray-600">텍스트 파일로 만들고 싶은 공개 레포지토리의 전체 URL을 입력해주세요.</p>
+                <input type="text" id="repo-url-input" placeholder="https://github.com/owner/repo" class="w-full p-3 mb-4 bg-gray-100/70 border border-gray-200/80 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <div class="flex justify-end gap-4">
+                    <button id="cancel-url-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-colors">취소</button>
+                    <button id="submit-url-btn" class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors">생성</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center hidden z-50">
+            <div class="flex flex-col items-center text-white">
+                <svg class="animate-spin h-10 w-10 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <p id="loading-message" class="text-lg">레포지토리를 불러오는 중이에요...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM Elements ---
+        const tokenScreen = document.getElementById('token-screen');
+        const repoScreen = document.getElementById('repo-screen');
+        const tokenInput = document.getElementById('token-input');
+        const submitTokenBtn = document.getElementById('submit-token');
+        const changeTokenBtn = document.getElementById('change-token-btn');
+        const repoList = document.getElementById('repo-list');
+        const orgTabs = document.getElementById('org-tabs');
+        const repoSearch = document.getElementById('repo-search');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingMessage = document.getElementById('loading-message');
+        const securityWarning = document.getElementById('security-warning');
+        
+        // URL Modal
+        const urlInputBtn = document.getElementById('url-input-btn');
+        const urlModal = document.getElementById('url-modal');
+        const urlModalContent = document.getElementById('url-modal-content');
+        const cancelUrlBtn = document.getElementById('cancel-url-btn');
+        const submitUrlBtn = document.getElementById('submit-url-btn');
+        const repoUrlInput = document.getElementById('repo-url-input');
+
+        // --- State ---
+        let githubToken = null;
+        let allRepos = [];
+        let currentOrg = 'all';
+
+        // --- API Helper ---
+        const GITHUB_API_BASE = 'https://api.github.com';
+        
+        // Decodes Base64 to a UTF-8 string.
+        function base64ToUtf8(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return new TextDecoder().decode(bytes);
+        }
+
+        async function githubApiRequest(endpoint, token, options = {}) {
+            const headers = {
+                'Accept': 'application/vnd.github.v3+json',
+                ...options.headers,
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            try {
+                const response = await fetch(`${GITHUB_API_BASE}${endpoint}`, { ...options, headers });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                return response;
+            } catch (error) {
+                console.error(`GitHub API request to ${endpoint} failed:`, error);
+                throw error;
+            }
+        }
+
+        async function fetchPaginated(endpoint, token) {
+            let results = [];
+            let nextUrl = `${GITHUB_API_BASE}${endpoint}`;
+
+            while (nextUrl) {
+                const response = await fetch(nextUrl, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                
+                results = results.concat(await response.json());
+
+                const linkHeader = response.headers.get('Link');
+                const nextLink = linkHeader?.split(',').find(s => s.includes('rel="next"'));
+                nextUrl = nextLink ? nextLink.match(/<(.+)>/)[1] : null;
+            }
+            return results;
+        }
+
+
+        // --- UI Functions ---
+        const showLoading = (message) => {
+            loadingMessage.textContent = message;
+            loadingOverlay.classList.remove('hidden');
+        };
+
+        const hideLoading = () => {
+            loadingOverlay.classList.add('hidden');
+        };
+
+        const showSecurityWarning = (message, isError = true) => {
+            securityWarning.textContent = message;
+            securityWarning.classList.remove('hidden', 'bg-yellow-100', 'text-yellow-800', 'bg-red-100', 'text-red-800');
+            if (isError) {
+                securityWarning.classList.add('bg-red-100', 'text-red-800');
+            } else {
+                securityWarning.classList.add('bg-yellow-100', 'text-yellow-800');
+            }
+        };
+        
+        const hideSecurityWarning = () => {
+            securityWarning.classList.add('hidden');
+        };
+
+        // --- Core Logic ---
+        const fetchAndDisplayRepos = async () => {
+            showLoading('레포지토리 목록을 불러오고 있어요...');
+            hideSecurityWarning();
+            try {
+                const repos = await fetchPaginated('/user/repos?type=all&per_page=100', githubToken);
+                allRepos = repos.sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at));
+                displayReposUI();
+                tokenScreen.classList.add('hidden');
+                repoScreen.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error fetching repos:', error);
+                localStorage.removeItem('github-token');
+                githubToken = null;
+                tokenScreen.classList.remove('hidden');
+                repoScreen.classList.add('hidden');
+                showSecurityWarning('토큰이 잘못되었거나 만료된 것 같아요. 다시 확인해주세요.');
+            } finally {
+                hideLoading();
+            }
+        };
+        
+        const filterAndDisplayReposUI = () => {
+            const searchTerm = repoSearch.value.toLowerCase();
+            const filteredRepos = allRepos.filter(repo => {
+                const inOrg = currentOrg === 'all' || repo.owner.login === currentOrg;
+                const matchesSearch = repo.name.toLowerCase().includes(searchTerm);
+                return inOrg && matchesSearch;
+            });
+
+            repoList.innerHTML = '';
+            if (filteredRepos.length === 0) {
+                repoList.innerHTML = `<p class="col-span-full text-center text-gray-500 py-8">일치하는 레포지토리가 없어요.</p>`;
+                return;
+            }
+
+            filteredRepos.forEach(repo => {
+                const card = document.createElement('div');
+                card.className = "repo-card bg-white p-5 rounded-2xl flex flex-col justify-between cursor-pointer transition-all duration-300 border hover:shadow-xl hover:border-blue-400 transform hover:-translate-y-1";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center mb-3">
+                            <img src="${repo.owner.avatar_url}" alt="${repo.owner.login}" class="w-7 h-7 rounded-full mr-3 border">
+                            <h3 class="font-bold text-lg truncate text-gray-800">${repo.name}</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 truncate h-5">${repo.description || '&nbsp;'}</p>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4 pt-2 border-t border-gray-100">Updated ${new Date(repo.pushed_at).toLocaleDateString()}</p>
+                `;
+                card.addEventListener('mouseenter', () => card.classList.add('bg-blue-50/50'));
+                card.addEventListener('mouseleave', () => card.classList.remove('bg-blue-50/50'));
+                card.addEventListener('click', () => downloadRepoAsTxt(repo));
+                repoList.appendChild(card);
+            });
+        };
+
+        const displayReposUI = () => {
+            const orgsData = new Map();
+            allRepos.forEach(repo => {
+                if (!orgsData.has(repo.owner.login)) {
+                    orgsData.set(repo.owner.login, { avatar: repo.owner.avatar_url, count: 0 });
+                }
+                orgsData.get(repo.owner.login).count++;
+            });
+
+            const sortedOrgs = Array.from(orgsData.keys()).sort();
+            
+            orgTabs.innerHTML = '';
+            
+            // "All" tab first
+            const allBtn = document.createElement('button');
+            allBtn.className = `org-tab whitespace-nowrap text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-200 bg-gray-200 hover:bg-gray-300 flex items-center gap-2`;
+            allBtn.innerHTML = `
+                전체
+                <span class="ml-auto bg-gray-400/80 text-white text-xs font-semibold px-2 py-0.5 rounded-full">${allRepos.length}</span>
+            `;
+            if (currentOrg === 'all') allBtn.classList.add('org-tab-active');
+            allBtn.addEventListener('click', () => {
+                currentOrg = 'all';
+                document.querySelectorAll('.org-tab').forEach(b => b.classList.remove('org-tab-active'));
+                allBtn.classList.add('org-tab-active');
+                filterAndDisplayReposUI();
+            });
+            orgTabs.appendChild(allBtn);
+
+            // Other org tabs
+            sortedOrgs.forEach(org => {
+                const orgData = orgsData.get(org);
+                const button = document.createElement('button');
+                button.className = `org-tab whitespace-nowrap text-sm font-semibold pl-2 pr-4 py-2 rounded-xl transition-all duration-200 bg-gray-200 hover:bg-gray-300 flex items-center gap-2`;
+                button.innerHTML = `
+                    <img src="${orgData.avatar}" alt="${org}" class="w-6 h-6 rounded-lg">
+                    ${org}
+                    <span class="ml-auto bg-gray-400/80 text-white text-xs font-semibold px-2 py-0.5 rounded-full">${orgData.count}</span>
+                `;
+                if (org === currentOrg) button.classList.add('org-tab-active');
+
+                button.addEventListener('click', () => {
+                    currentOrg = org;
+                    document.querySelectorAll('.org-tab').forEach(b => b.classList.remove('org-tab-active'));
+                    button.classList.add('org-tab-active');
+                    filterAndDisplayReposUI();
+                });
+                orgTabs.appendChild(button);
+            });
+            filterAndDisplayReposUI();
+        };
+
+        const downloadRepoAsTxt = async (repo) => {
+            showLoading(`'${repo.name}' 레포지토리 구조를 가져오는 중이에요...`);
+            let fileContents = '';
+            
+            try {
+                const treeResponse = await githubApiRequest(`/repos/${repo.owner.login}/${repo.name}/git/trees/${repo.default_branch}?recursive=1`, githubToken);
+                const treeData = await treeResponse.json();
+
+                let fileStructure = `${repo.name}/\n`;
+                const paths = treeData.tree.map(file => file.path);
+                
+                const buildTree = (paths) => {
+                    const root = {};
+                    paths.forEach(path => {
+                        path.split('/').reduce((r, name, i, a) => {
+                            if (!r[name]) {
+                                r[name] = {};
+                                if (i === a.length - 1) {
+                                    r[name] = null; // file
+                                }
+                            }
+                            return r[name];
+                        }, root);
+                    });
+                    const generateLines = (node, prefix = '') => {
+                        let lines = [];
+                        const entries = Object.entries(node).sort(([a_key, a_val], [b_key, b_val]) => {
+                           const a_is_dir = a_val !== null;
+                           const b_is_dir = b_val !== null;
+                           if(a_is_dir === b_is_dir) return a_key.localeCompare(b_key);
+                           return a_is_dir ? -1 : 1;
+                        });
+                        entries.forEach(([key, value], index) => {
+                            const isLast = index === entries.length - 1;
+                            const connector = isLast ? '└── ' : '├── ';
+                            const newPrefix = prefix + (isLast ? '    ' : '│   ');
+                            lines.push(prefix + connector + key);
+                            if (value !== null) {
+                                lines.push(...generateLines(value, newPrefix));
+                            }
+                        });
+                        return lines;
+                    };
+                    return generateLines(root).join('\n');
+                };
+                fileStructure = buildTree(paths);
+                fileContents += `<repository_file_tree>\n${fileStructure}\n</repository_file_tree>\n\n`;
+
+                const filesToFetch = treeData.tree.filter(file => file.type === 'blob' && file.size > 0);
+                let processedFiles = 0;
+                for (const file of filesToFetch) {
+                    processedFiles++;
+                    showLoading(`'${file.path}' 파일을 읽는 중이에요... (${processedFiles}/${filesToFetch.length})`);
+                    try {
+                        const blobResponse = await githubApiRequest(`/repos/${repo.owner.login}/${repo.name}/git/blobs/${file.sha}`, githubToken);
+                        const blobData = await blobResponse.json();
+                        
+                        const content = base64ToUtf8(blobData.content);
+                        const isBinary = /[\x00-\x08\x0E-\x1F]/.test(content);
+                        if (isBinary) { continue; }
+
+                        fileContents += `< ${file.path} >\n`;
+                        fileContents += content;
+                        fileContents += `\n</ ${file.path} >\n\n`;
+                    } catch(e) {
+                         console.error(`Could not process file: ${file.path}`, e);
+                         continue;
+                    }
+                }
+
+                const blob = new Blob([fileContents], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${repo.full_name.replace('/', '_')}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                showLoading(`오류가 발생했어요: ${error.message}. 다시 시도해주세요.`);
+                setTimeout(hideLoading, 3000);
+            } finally {
+                hideLoading();
+            }
+        };
+        
+        const handleUrlSubmit = async (url) => {
+            const githubUrlRegex = /github\.com\/([^/]+)\/([^/]+)(?:\.git)?/;
+            const match = url.match(githubUrlRegex);
+            if (!match) {
+                showSecurityWarning('잘못된 GitHub 레포지토리 URL 형식이에요. 다시 확인해주세요.');
+                setTimeout(hideSecurityWarning, 4000);
+                return;
+            }
+            const owner = match[1];
+            const repoName = match[2].replace('.git', '');
+            showLoading(`'${owner}/${repoName}' 레포지토리 정보를 가져오는 중이에요...`);
+            try {
+                const repoResponse = await githubApiRequest(`/repos/${owner}/${repoName}`, githubToken);
+                const repoData = await repoResponse.json();
+                await downloadRepoAsTxt(repoData);
+            } catch (error) {
+                 showLoading(`레포지토리를 가져오는 중 오류가 발생했어요: ${error.message}`);
+                 setTimeout(hideLoading, 4000);
+            }
+        };
+        
+        const openUrlModal = () => {
+            urlModal.classList.remove('hidden');
+            setTimeout(() => {
+                urlModalContent.classList.remove('scale-95', 'opacity-0');
+                urlModalContent.classList.add('scale-100', 'opacity-100');
+                repoUrlInput.focus();
+            }, 10);
+        };
+
+        const closeUrlModal = () => {
+             urlModalContent.classList.remove('scale-100', 'opacity-100');
+             urlModalContent.classList.add('scale-95', 'opacity-0');
+             setTimeout(() => {
+                urlModal.classList.add('hidden');
+             }, 200);
+        };
+
+        const init = () => {
+            githubToken = localStorage.getItem('github-token');
+            if (githubToken) {
+                fetchAndDisplayRepos();
+            } else {
+                 showSecurityWarning("시작하려면 GitHub 토큰을 입력해주세요.", false);
+            }
+        };
+
+        // --- Event Listeners ---
+        submitTokenBtn.addEventListener('click', () => {
+            const tokenValue = tokenInput.value;
+            if (tokenValue) {
+                localStorage.setItem('github-token', tokenValue);
+                githubToken = tokenValue;
+                fetchAndDisplayRepos();
+            }
+        });
+
+        changeTokenBtn.addEventListener('click', () => {
+            localStorage.removeItem('github-token');
+            githubToken = null;
+            allRepos = [];
+            currentOrg = 'all';
+            repoScreen.classList.add('hidden');
+            tokenScreen.classList.remove('hidden');
+            tokenInput.value = '';
+            showSecurityWarning("토큰이 변경되었어요. 새로 입력해주세요.", false);
+        });
+
+        repoSearch.addEventListener('input', filterAndDisplayReposUI);
+        
+        urlInputBtn.addEventListener('click', openUrlModal);
+        cancelUrlBtn.addEventListener('click', closeUrlModal);
+        urlModal.addEventListener('click', (e) => {
+            if(e.target === urlModal) {
+                 closeUrlModal();
+            }
+        });
+
+        submitUrlBtn.addEventListener('click', () => {
+            const url = repoUrlInput.value.trim();
+            if (url) {
+                handleUrlSubmit(url);
+                closeUrlModal();
+                repoUrlInput.value = '';
+            }
+        });
+
+        // --- App Initialization ---
+        init();
+    });
+    </script>
+</body>
+</html>
