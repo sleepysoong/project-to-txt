@@ -1,4 +1,7 @@
-# Project -> txt
+# <img src="favicon.ico" style="height:1em; width:auto; vertical-align:middle; margin-right:4px; position:relative; top:-3px;"> Project -> txt
+
+
+[🔗 클릭하여 홈페이지로 이동하기](https://project-to-txt.vercel.app/)
 
 프로젝트를 단일 텍스트 파일로 변환해주는 사이트입니다.
 AI한테 파일 던져주기 귀찮아서 만들었는데 편하답니다 👍 (제가 쓰려고 만들었어요)
