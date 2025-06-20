@@ -1,10 +1,10 @@
-# <img src="favicon.ico" style="height:1em; width:auto; vertical-align:middle; margin-right:4px; position:relative; top:-0px;"> Project -> txt
-
+# <img src="favicon.ico" style="height:1em; width:auto; vertical-align:middle; margin-right:4px; position:relative;"> 
 
 [🔗 클릭하여 홈페이지로 이동하기](https://project-to-txt.vercel.app/)
 
-프로젝트를 단일 텍스트 파일로 변환해주는 사이트입니다.
-AI한테 파일 던져주기 귀찮아서 만들었는데 편하답니다 👍 (제가 쓰려고 만들었어요)
+
+`project-to-txt`는 `프로젝트`를 `단일 텍스트 파일`로 변환해주는 사이트입니다.
+`AI`한테 파일 던져주기 귀찮아서 만들었는데 편하답니다 👍 (제가 쓰려고 만들었어요)
 
 GitHub 레포지토리를 텍스트 파일로 쉽게 변환할 수 있는 웹 애플리케이션입니다.
 
